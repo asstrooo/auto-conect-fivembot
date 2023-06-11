@@ -1,105 +1,121 @@
-const { Client, MessageEmbed, MessageButton, MessageActionRow, Intents } = require("discord.js");
-
-const client = new Client({
-    intents:
-        [
-            Intents.FLAGS.GUILDS,
-            Intents.FLAGS.GUILD_MESSAGES
-        ],
-});
-
-const config = require('./config.json')
-const colors = require('colors')
+const Discord = require("discord.js");
 const axios = require('axios')
+const client = new Discord.Client({ intents: 32767 });
+const config = require('./config.json');
+const colors = require('colors')
 
+/**
+ * @param {Discord.Message} message
+ */
 
+client.on("ready", async(message) => {
+    console.log(colors.blue('[#] Bot iniciado com sucesso, update sendo realizado dentro de segundos.'))
 
-client.on(`ready`, () => {
-    console.log(colors.cyan("[Info] ") + "Carregamento do bot iniciado.\n")
-})
+    var data = { players: "" }
 
-var data = {}
+    async function message() {
 
-client.on("ready", async () => {
-    
-    var players = 0
+        async function update_info() {
 
-    async function players_online() {
-        await axios.get(`http://${config.ip}${config.porta}/players.json`).then(response => {
-            data.players = response.data.length
-        }).catch(err => data.players = -1)
+            await axios.get(`http://${config.ip}:${config.porta}/players.json`).then(response => {
+                console.log(colors.green('[+] Ediando Mensaje...'))
+                data.players = response.data.length
+            }).catch(err => data.players = -1)
+        }
 
-    }
-    
-    async function autoconnect() {
+        await update_info()
+
         await client.channels.cache.get(config.Canal).bulkDelete(100).catch(() => console.error)
 
         if (data.players === -1) {
-            var embed = new MessageEmbed()
-                .setColor("RED")
+            var embed = new Discord.MessageEmbed()
+
+            .setColor('#ff0000')
+                .setTitle('[❌] SERVIDOR APAGADO')
+                .addField(`Players:`, `\`\`\`ini\n [ 0/64 ] \`\`\``, true)
+                .addField('**Status:**', '```Bash\n🔴 Offline ```', true)
+                .addField('**IP Servidor:**', `\`\`\`Esperando a que el servidor se estabilice!\`\`\``, false)
+                .addField('**Invite discord**:', `\`\`\`${config.discordinvite}\`\`\``, false)
                 .setThumbnail(config.Logo)
-                .setDescription(`Utilize os links para acessar nosso servidor.`)
-                .addFields(
-                    { name: 'Status', value: '```fix\nOffline```' },
-                    { name: 'IP SERVER', value: "```bash\n" + config.ip + "```" },
-                    { name: 'IP TS', value: "```bash\n" + config.ts3 + "```" },
-                )
 
         } else {
-            var embed = new MessageEmbed()
-                .setColor('#2F3136')
-                .setThumbnail(config.Logo)
-                .setDescription(`Utilize os links para acessar nosso servidor.`)
-                .addFields(
-                    { name: 'Status', value: '```fix\nOnline```', inline: true },
-                    { name: 'Jogadores Online', value: "```ini\n[ " + data.players + "/250 ]```", inline: true },
-                    { name: 'IP SERVER', value: "```bash\n" + config.ip + "```" },
-                    { name: 'IP TS', value: "```bash\n" + config.ts3 + "```" },
-                )
+            var embed = new Discord.MessageEmbed()
+
+            .setTitle(config.Titulo)
+                .setColor('#55ff00')
+                .setURL ("https://cfx.re/join/ry67gx")
+                .addField(`[<:players:1117034374500712509> ] Jugadores:`, `\`\`\`ini\n [ ${data.players}/64 ] \`\`\``, true)
+                .addField('**[<:status:1117034372583936090>] Status:**', '```Bash\n🟢 Online ```', true)
+                .addField('**[<:sucesso:1117034375729651773>] IP Servidor:**', `\`\`\`${config.ip2}\`\`\``, false)
+                .addField('**[<:discordlogotransparentgray3:1116324577295999068>] Invite Discord**:', `\`\`\`${config.discordinvite}\`\`\``, false)
+                .setFooter("[!] By ♥ !Ramzy")
+                .setThumbnail(config.Logo)      
+              
+
+
+
 
         }
 
-        const autoconnect = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-            .setStyle("LINK")
+        const CFX = new Discord.MessageButton()
+
+        .setStyle("LINK")
             .setLabel(`FiveM`)
             .setEmoji('878251971021246465')
-            .setURL(config.CFX.url),
-        
-            new MessageButton()
-            .setStyle("LINK")
-            .setLabel(`TeamSpeak3`)
-            .setEmoji('878251970895429693')
-            .setURL(config.TS3.url)
-            );
+            .setURL(config.connect.url)
+            
+
+        const ts = new Discord.MessageButton()
+
+        .setStyle("LINK")
+            .setLabel(`Discord`)
+            .setEmoji('1116324577295999068')
+            .setURL(config.DISCORD.url)
+
+        const row = new Discord.MessageActionRow().addComponents([CFX, ts])
 
         await client.channels.cache.get(config.Canal).send({
-      embeds: [embed], components: [autoconnect]
-    }).then(msg => {
-            setInterval(() => {
+            components: [row],
+            embeds: [embed]
+        }).then(msg => {
+
+            setInterval(async() => {
                 if (data.players === -1) {
-                    embed.color = "RED"
-                    embed.fields[0] = {name : 'Status' , value : '```fix\nOffline```'}
-                    msg.edit(embed)
+                    embed.fields[0].value = `\`\`\`ini\n [ 0/64 ] \`\`\``
+                    embed.fields[1].value = `\`\`\`Bash\n "🔴 Offline " \`\`\``
+                    msg.edit({ embeds: [embed] })
                 } else {
-                    embed.description = `Utilize os links para acessar nosso servidor.`
-                    embed.fields[1] = { name: 'Jogadores Online', value: "```ini\n[ " + data.players + "/250 ]```", inline: true }
-                    msg.edit(embed)
+                    embed.fields[0].value = `\`\`\`ini\n [ ${data.players}/64 ] \`\`\``
+                    embed.fields[1].value = `\`\`\`Bash\n "🟢 Online " \`\`\``
+                    msg.edit({ embeds: [embed] })
                 }
-            }, 30000);
+                async function update_info() {
+                    await axios.get(`http://${config.ip}:${config.porta}/players.json`).then(response => {
+                        console.log(colors.green('[+] Update Mensaje...'))
+                        data.players = response.data.length
+                    }).catch(err => data.players = -1)
+                }
+                await update_info()
+            }, 15000);
         })
     }
-
-
-    autoconnect()
-
-    setInterval(() => {
-        client.user.setStatus('dnd');
-        client.user.setActivity(`${config.name} com ${data.players} players.`, { type: 'PLAYING' })
-        players_online()
-    }, 10000)
-
+    message()
 })
 
-client.login(config.token)
+function presence() {
+    let statuses = [
+      `BY ♥ !RAMZY`,
+      `${client.users.cache.size} usuarios`
+    ];
+  
+    setInterval(function () {
+  
+      let status = statuses[Math.floor(Math.random() * statuses.length)];
+      client.user.setActivity(status, { type: "WATCHING", status: 'dnd' });
+  
+    }, 10000);
+  
+  }
+  
+
+client.login(config.token);
