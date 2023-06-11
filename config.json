@@ -1,15 +1,17 @@
 {
-    "token": "MTExMzUzMjE2NjgxMTQzNTEyOA.GYT7ba.5ijLJNCnl_6MmXH6r4Gi1EmUN-lcWCwqLNCP5c",
-    "ip": "212.227.163.56",
-    "porta": "30120",
-    "ts3": "ts.hz0000.com",
-    "name": "HZ000",
-    "Canal": "1115588952406106182",
-    "Logo": "",
-    "CFX": {
-        "url": "https://github.com/hz0000"
+    "token": "tu_token", 
+    "ip": "tu_ip numerica", 
+    "Titulo" : "__<:874242093743243274:1116316496801570917> [!] **Utilize Los Links para poder Acceder al servidor**__",
+    "ip2": "tu_connect", 
+    "porta": "30120", 
+    "discordinvite": "discord.gg/Heladosrp", 
+    "name": "HeladosRP", 
+    "Canal": "id_canal_enviar_status", 
+    "Logo": "https://cdn.discordapp.com/attachments/1116783925256261694/1117029599382077470/F21392A4-BF9D-47F0-86BB-6335737FF38F.png", 
+    "connect": {
+        "url": "https://cfx.re/join/ry67gx" 
     },
-    "TS3": {
-        "url": "https://github.com/hz0000"
+    "DISCORD": {
+        "url": "https://discord.gg/Heladosrp" 
     }
 }
